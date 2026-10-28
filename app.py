@@ -70,8 +70,9 @@ custom_css = """<style>
 :root{--bg:#07020a;--pink:#e8a0bf;--cy:#22d3ff;--red:#ff2d55;--grn:#2dffa0;--amb:#ffa31a;--yel:#ffd23f;--ink:#f6dce8;
 --serif:'Fraunces',Georgia,serif;--sans:'Chakra Petch','Segoe UI',system-ui,sans-serif}
 html,body,.stApp{background:var(--bg)!important}
-[data-testid=stAppViewContainer],[data-testid=stHeader]{background:transparent!important}
-#MainMenu,footer{visibility:hidden}
+[data-testid=stAppViewContainer]{background:transparent!important}
+header[data-testid="stHeader"], [data-testid="stToolbar"]{display:none!important;visibility:hidden!important;pointer-events:none!important}
+#MainMenu,footer{visibility:hidden!important}
 .stApp,.stApp p,.stApp label,.stApp span:not([data-testid*="Icon"]):not([data-testid*="icon"]):not([class*="material-symbols"]):not([class*="material-icons"]):not([class*="stExpanderToggleIcon"]),.stApp li{font-family:var(--sans);color:var(--ink)}
 [data-testid*="Icon"],[data-testid*="icon"],[class*="material-symbols"],[class*="material-icons"],[data-testid="stExpanderToggleIcon"]{font-family:'Material Symbols Rounded','Material Symbols Outlined','Material Icons',sans-serif!important;font-feature-settings:'liga' 1!important;letter-spacing:normal!important;text-transform:none!important}
 .block-container{position:relative;z-index:1;max-width:1250px;padding-top:1.2rem}
@@ -231,14 +232,17 @@ h2.sec{scroll-margin-top:86px!important}
 .ev .eb p{margin:0 0 6px}
 .ev .eb code{display:block;margin-top:8px;padding:8px 10px;border-radius:10px;background:rgba(0,0,0,.45);color:#fff;font-size:12px;white-space:pre-wrap;word-break:break-all}
 /* ---- demo settings: floating toggle + panel */
-.st-key-setfab{position:fixed;right:22px;bottom:22px;z-index:1001;width:auto!important}
+.st-key-setfab{position:fixed;right:22px;bottom:22px;z-index:9999999!important;width:auto!important}
 .st-key-setfab button{border-radius:50px;padding:.5rem 1.3rem;border:none;background:linear-gradient(135deg,#f3b8d2,#c46a97);box-shadow:0 8px 28px rgba(232,120,170,.5)}
 .st-key-setfab button p{color:#1a0610;font:700 15px var(--sans)}
 .st-key-setfab button:hover{box-shadow:0 8px 36px rgba(232,120,170,.8);color:#1a0610}
-.st-key-setpanel{position:fixed;right:22px;bottom:86px;z-index:1000;width:min(340px,calc(100vw - 44px));padding:18px 20px 10px;border-radius:22px;background:linear-gradient(145deg,rgba(40,14,26,.92),rgba(12,4,9,.92));backdrop-filter:blur(16px);border:1px solid rgba(232,160,191,.4);box-shadow:0 22px 50px rgba(0,0,0,.6);transition:opacity .3s,transform .3s,visibility .3s}
+.st-key-setpanel{position:fixed;right:22px;bottom:86px;z-index:9999998!important;width:min(350px,calc(100vw - 44px));max-height:calc(100vh - 110px);overflow-y:auto;overscroll-behavior:contain;padding:18px 20px 14px;border-radius:22px;background:linear-gradient(145deg,rgba(40,14,26,.97),rgba(12,4,9,.97));backdrop-filter:blur(20px);border:1px solid rgba(232,160,191,.45);box-shadow:0 22px 60px rgba(0,0,0,.75);transition:opacity .3s,transform .3s,visibility .3s}
+.st-key-setpanel::-webkit-scrollbar{width:5px}
+.st-key-setpanel::-webkit-scrollbar-thumb{background:rgba(232,160,191,.35);border-radius:4px}
 .st-key-setpanel [data-testid="stExpander"]{background:rgba(0,0,0,.45)!important;border:1px solid rgba(232,160,191,.25)!important;border-radius:14px!important;margin-top:8px}
 .st-key-setpanel [data-testid="stExpander"] summary{padding:6px 10px!important}
 .st-key-setpanel [data-testid="stExpander"] summary p{font-size:13px!important;margin:0!important;white-space:nowrap!important}
+.st-key-setpanel [data-testid="stCheckbox"] label{cursor:pointer!important}
 .sp-title{font:600 22px var(--serif);color:#fff;margin-bottom:6px}
 [data-testid=stElementContainer]:has(iframe[height="0"]){position:absolute;width:0;height:0;margin:0;overflow:hidden}
 @media(max-width:800px){.nav .links{display:none}.nav{border-radius:22px}}
