@@ -34,10 +34,14 @@ def is_configured():
 def _api_request(endpoint, method="GET", payload=None, extra_headers=None):
     """Executes a direct PostgREST HTTP request to the Supabase database."""
     url, key = get_credentials()
-    if not url or not key:
+    clean_url = url.strip().rstrip("/")
+    if clean_url.endswith("/rest/v1"):
+        clean_url = clean_url[:-8].rstrip("/")
+        
+    if not clean_url or not key:
         return None, "Supabase credentials not configured."
         
-    full_url = f"{url.rstrip('/')}/rest/v1/{endpoint.lstrip('/')}"
+    full_url = f"{clean_url}/rest/v1/{endpoint.lstrip('/')}"
     headers = {
         "apikey": key,
         "Authorization": f"Bearer {key}",
