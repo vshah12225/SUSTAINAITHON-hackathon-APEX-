@@ -1,6 +1,7 @@
 """The (simulated) cloud: signature check, 3-car consensus, peer testing, deployment."""
 import json
 
+import db
 from signing import CLOUD_KEY, car_key, rule_key, sign
 
 REQUIRED = 3
@@ -35,8 +36,21 @@ class Cloud:
         self.provisional = {}         # key -> {"rule": ALERT-only version, "sig": ...}
         self.fast_response = False    # off by default to strictly demonstrate 3-car consensus
 
+        # Sync persisted antibodies from Supabase on cloud startup
+        try:
+            persisted = db.load_antibodies()
+            if persisted:
+                self.deployed.update(persisted)
+                self.events.insert(0, f"☁️ Supabase: Synced {len(persisted)} active antibodies from cloud DB")
+        except Exception:
+            pass
+
     def log(self, msg):
         self.events.insert(0, msg)
+        try:
+            db.log_event(msg)
+        except Exception:
+            pass
 
     def has_antibody_for(self, target_id):
         return any(d["rule"]["target_id"] == target_id for d in self.deployed.values())
@@ -48,6 +62,10 @@ class Cloud:
         self.provisional.pop(k, None)
         sig = sign(CLOUD_KEY, rule)
         self.deployed[k] = {"rule": rule, "sig": sig}
+        try:
+            db.save_antibody(rule, sig)
+        except Exception:
+            pass
         self.log(f"💉 FLEET VACCINE ACTIVE: Antibody deployed to all cars ({json.dumps(rule)})")
         if self.on_deploy:
             self.on_deploy(rule, sig)
@@ -57,6 +75,10 @@ class Cloud:
             self.log(f"☁️ Rejected report from Car {car_id}: bad signature")
             return
         k = rule_key(rule)
+        try:
+            db.save_report(car_id, rule, sig)
+        except Exception:
+            pass
         if k in self.deployed:
             return
         entry = self.pending.setdefault(k, {"rule": rule, "reports": {}})
@@ -102,6 +124,10 @@ class Cloud:
             return
         sig = sign(CLOUD_KEY, final)
         self.deployed[rule_key(final)] = {"rule": final, "sig": sig}
+        try:
+            db.save_antibody(final, sig)
+        except Exception:
+            pass
         self.log(f"✅ CONSENSUS REACHED: ANTIBODY DEPLOYED ({json.dumps(final)})")
         if self.on_deploy:
             self.on_deploy(final, sig)
