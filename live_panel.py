@@ -78,13 +78,14 @@ LIVE_CSS = """<style>
 
 # the attacker's page is shown instead of the whole app, so it carries the same look by itself
 ATTACKER_CSS = """<style>
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Chakra+Petch:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Chakra+Petch:wght@400;500;600;700&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
 :root{--bg:#07020a;--pink:#e8a0bf;--cy:#22d3ff;--red:#ff2d55;--grn:#2dffa0;--amb:#ffa31a;--yel:#ffd23f;--ink:#f6dce8;
 --serif:'Fraunces',Georgia,serif;--sans:'Chakra Petch','Segoe UI',system-ui,sans-serif}
 html,body,.stApp{background:var(--bg)!important}
 [data-testid=stAppViewContainer],[data-testid=stHeader]{background:transparent!important}
 #MainMenu,footer{visibility:hidden}
-.stApp,.stApp p,.stApp label,.stApp span,.stApp li{font-family:var(--sans);color:var(--ink)}
+.stApp,.stApp p,.stApp label,.stApp span:not([data-testid*="Icon"]):not([data-testid*="icon"]):not([class*="material-symbols"]):not([class*="material-icons"]):not([class*="stExpanderToggleIcon"]),.stApp li{font-family:var(--sans);color:var(--ink)}
+[data-testid*="Icon"],[data-testid*="icon"],[class*="material-symbols"],[class*="material-icons"],[data-testid="stExpanderToggleIcon"]{font-family:'Material Symbols Rounded','Material Symbols Outlined','Material Icons',sans-serif!important;font-feature-settings:'liga' 1!important;letter-spacing:normal!important;text-transform:none!important}
 .block-container{position:relative;z-index:1;max-width:1100px;padding-top:1.2rem}
 [data-testid=stElementContainer]:has(.atkbg){position:absolute;width:0;height:0;margin:0}
 .atkbg{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
