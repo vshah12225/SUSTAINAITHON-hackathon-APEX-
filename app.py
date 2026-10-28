@@ -38,6 +38,15 @@ if os.path.exists(".env"):
     except Exception:
         pass
 
+# Also support Streamlit Cloud secrets (st.secrets)
+try:
+    if hasattr(st, "secrets"):
+        for _sk in ("GEMINI_API_KEY", "GOOGLE_API_KEY", "GEMINI_MODEL"):
+            if _sk in st.secrets and _sk not in os.environ:
+                os.environ[_sk] = str(st.secrets[_sk])
+except Exception:
+    pass
+
 st.set_page_config(page_title="ImmuneFleet", page_icon="🛡️", layout="wide")
 
 # ---- Live attack lab: a teammate opens  http://<this-computer>:8501/?role=attacker  and sees ONLY the attacker console
