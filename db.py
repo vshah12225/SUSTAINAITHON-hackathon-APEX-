@@ -145,3 +145,20 @@ def save_report(car_id, rule, signature):
     }]
     res, err = _api_request("incident_reports", method="POST", payload=payload)
     return err is None
+
+
+def fetch_antibodies_table(limit=10):
+    """Fetches raw rows from the antibodies table for reviewer inspection."""
+    if not is_configured():
+        return []
+    res, err = _api_request(f"antibodies?select=id,target_id,action,threat,signature,deployed_at&order=deployed_at.desc&limit={limit}")
+    return res if isinstance(res, list) else []
+
+
+def fetch_events_table(limit=5):
+    """Fetches raw rows from the fleet_events audit trail for reviewer inspection."""
+    if not is_configured():
+        return []
+    res, err = _api_request(f"fleet_events?select=id,message,event_type,created_at&order=id.desc&limit={limit}")
+    return res if isinstance(res, list) else []
+

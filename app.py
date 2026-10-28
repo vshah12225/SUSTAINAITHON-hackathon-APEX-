@@ -807,6 +807,31 @@ with right:
     st.markdown("<h2 class='sec' id='consensus'>Cloud</h2><p class='secsub'>Where cars vote on a rule.</p>", unsafe_allow_html=True)
     st.markdown(cloud_html(S.cloud), unsafe_allow_html=True)
 
+    # ---- Live Supabase proof widget for hackathon reviewers
+    with st.container(border=True):
+        db_ok, db_msg = db.test_connection()
+        sc1, sc2 = st.columns([2.4, 1.6])
+        with sc1:
+            if db_ok:
+                st.markdown("<b style='color:#2df5a0'>⚡ Supabase Fleet DB: Connected</b><br><span style='font-size:12px;opacity:0.8'>PostgreSQL Cloud Consensus Ledger &amp; HMAC Registry</span>", unsafe_allow_html=True)
+            else:
+                st.markdown("<b style='color:#ffd23f'>💾 Cloud DB: In-Memory Demo Mode</b><br><span style='font-size:12px;opacity:0.8'>Connect Supabase in ⚙️ Settings to persist across fleets</span>", unsafe_allow_html=True)
+        with sc2:
+            st.write("")
+            inspect_clicked = st.button("🔍 Live DB Rows", key="btn_inspect_db", use_container_width=True)
+        
+        if inspect_clicked or S.get("show_live_db"):
+            S.show_live_db = True
+            rows = db.fetch_antibodies_table(limit=5)
+            if rows:
+                st.caption(f"**Live `antibodies` table from Supabase ({len(rows)} verified rules):**")
+                st.dataframe(rows, use_container_width=True, hide_index=True)
+            else:
+                if db_ok:
+                    st.caption("ℹ️ Supabase connected. Deploy an antibody above to see rows inserted live!")
+                else:
+                    st.caption("ℹ️ Configure `SUPABASE_URL` and `SUPABASE_KEY` in `.env` or Settings.")
+
 # ---------------------------------------------------------------- virus lab
 st.markdown("<h2 class='sec' id='virus'>Virus lab</h2><p class='secsub'>Zero-day malware infiltration & real-time fleet immunization.</p>", unsafe_allow_html=True)
 with st.container(border=True, key="virus_box"):
