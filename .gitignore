@@ -28,6 +28,8 @@ Thumbs.db
 # IDE & Editor folders
 .vscode/
 .idea/
+.agents/
+.claude/
 *.swp
 *.swo
 *~

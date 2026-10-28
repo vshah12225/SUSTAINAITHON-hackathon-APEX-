@@ -40,6 +40,13 @@ if os.path.exists(".env"):
 
 st.set_page_config(page_title="ImmuneFleet", page_icon="🛡️", layout="wide")
 
+# ---- Live attack lab: a teammate opens  http://<this-computer>:8501/?role=attacker  and sees ONLY the attacker console
+from live_panel import is_attacker_view, render_attacker_console, render_live_defense
+
+if is_attacker_view():
+    render_attacker_console()
+    st.stop()
+
 N_CARS = 5
 ATTACK_TARGET = "0x1A2"
 STAGE_SIZES = [1, 3, N_CARS]  # canary cars, then half the fleet, then everyone
@@ -858,6 +865,9 @@ with st.container(border=True, key="benchmark_box"):
 
         st.caption("ℹ️ *Note for reviewers: The 5 vehicle streams are partitioned slices from a real continuous Hyundai Sonata CAN recording from the Korea University HCRL lab, validating collective defense on physical automotive hardware without simulation.*")
 
+# ---------------------------------------------------------------- live attack lab
+render_live_defense()
+
 st.markdown("<h2 class='sec' id='log'>Event log</h2>", unsafe_allow_html=True)
 st.markdown("<p class='secsub'>The story of a defense, step by step. Click any event to see what it means.</p>", unsafe_allow_html=True)
 st.markdown(log_ribbon(S.cloud.events), unsafe_allow_html=True)
@@ -865,7 +875,7 @@ _flt = st.radio("Show", list(FILTERS), horizontal=True, key="ev_filter", label_v
 st.markdown(log_html(S.cloud.events, _flt), unsafe_allow_html=True)
 
 
-components.html("""<script>
+st.html("""<script>
 (function(){var P=window.parent,D=P.document;if(P.__ifNav)return;P.__ifNav=1;
 var MAP={fleet:'the fleet',evidence:'what leaves the car',consensus:'cloud',virus:'virus lab',benchmark:'real vehicle can benchmark',log:'event log'};
 function find(id){var el=D.getElementById(id);if(el)return el;var hs=D.querySelectorAll('h1,h2,h3');
@@ -874,7 +884,7 @@ D.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest(
 var id=(a.getAttribute('href')||'').replace('#','');if(!MAP[id])return;e.preventDefault();
 var el=find(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});},true);
 })();
-</script>""", height=0)
+</script>""")
 
 # ---------------------------------------------------------------- driver (rollout stages and auto-play)
 if S.rollout:
