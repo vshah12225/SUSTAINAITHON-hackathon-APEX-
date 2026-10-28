@@ -49,6 +49,7 @@ except Exception:
 
 import db
 import log_analyzer
+import patent_spec
 
 st.set_page_config(page_title="ImmuneFleet", page_icon="🛡️", layout="wide")
 
@@ -924,6 +925,16 @@ with st.container(border=True, key="virus_box"):
             st.json(ve["antibody"])
             st.caption("Signed by Cloud ➔ Broadcasted ➔ All other EV cars are now immune!")
 
+        with st.expander("🛠️ Export Deployable Vehicle Firmware (SocketCAN / Embedded C / Kernel eBPF)", icon="🔧"):
+            st.caption("Auto-generated production firewall rules ready to flash onto vehicle ECUs:")
+            t_sc, t_c, t_bpf = st.tabs(["Linux SocketCAN (cangw)", "Embedded C (STM32/ESP32)", "Kernel eBPF Driver"])
+            with t_sc:
+                st.code(patent_spec.generate_socketcan_code(ve["antibody"]), language="bash")
+            with t_c:
+                st.code(patent_spec.generate_embedded_c_code(ve["antibody"]), language="c")
+            with t_bpf:
+                st.code(patent_spec.generate_ebpf_code(ve["antibody"]), language="c")
+
 @st.cache_data
 def run_real_can_benchmark():
     import pipeline as pl
@@ -1087,6 +1098,14 @@ with st.container(border=True, key="diag_box"):
                     S.cloud.deploy_vaccine(analysis["antibody"])
                     st.success(f"✅ Antibody for {analysis['antibody']['target_id']} deployed fleet-wide and saved to Supabase!")
                     st.rerun()
+                with st.expander("🛠️ Export Firmware Filter Code", icon="🔧"):
+                    t1, t2, t3 = st.tabs(["Linux SocketCAN", "Embedded C", "Kernel eBPF"])
+                    with t1:
+                        st.code(patent_spec.generate_socketcan_code(analysis["antibody"]), language="bash")
+                    with t2:
+                        st.code(patent_spec.generate_embedded_c_code(analysis["antibody"]), language="c")
+                    with t3:
+                        st.code(patent_spec.generate_ebpf_code(analysis["antibody"]), language="c")
             else:
                 st.success("✅ No attack pattern detected. All frame rates comply with normal automotive baseline intervals.")
 
@@ -1176,6 +1195,38 @@ with st.container(border=True, key="investor_box"):
             ok, msg = db.save_enterprise_inquiry(req_company.strip(), req_email.strip(), req_size, req_platform)
             st.success(f"✅ Pilot request registered for **{req_company.strip()}**! {msg}")
             st.balloons()
+
+    st.markdown("<div style='height:14px;border-top:1px solid rgba(255,255,255,0.08);margin:12px 0'></div>", unsafe_allow_html=True)
+
+    # Row 4: Intellectual Property & Patent Portfolio
+    with st.expander("🛡️ Intellectual Property & Patent Claims Portfolio (Confidential)", icon="📜"):
+        st.markdown("""
+        ### Core Patent Claims (Docket: IMFL-2026-001)
+        **Title:** *System and Method for Decentralized, Privacy-Preserving Collective Immunization of Connected Vehicle Bus Architectures*
+        
+        #### 1. Claim 1: Zero-Knowledge On-Vehicle Antibody Synthesis
+        * **Technical Problem:** Centralized VSOCs collect gigabytes of raw CAN telemetry, exposing driver GPS, travel histories, driving styles, and VINs (violating GDPR Article 25 & UNECE WP.29 CSMS).
+        * **Our Invention:** A local ECU kernel privacy filter that purges all PII (VIN, GPS, speed, timestamps) and reduces the anomaly into a sub-100-byte mathematical rule (59-byte antibody).
+        
+        #### 2. Claim 2: Asymmetric Multi-Vehicle Quorum Consensus
+        * **Technical Problem:** A single hijacked vehicle reporting false positives could trigger a fleet-wide denial-of-service, disabling legitimate braking or steering.
+        * **Our Invention:** An asymmetric multi-vehicle quorum engine requiring $K$-of-$N$ (e.g. 3 of 5) independently signed cryptographic proofs from distinct ECUs before any fleet-wide rule is enacted.
+        
+        #### 3. Claim 3: Autonomous Peer Shadow Sandbox Verification
+        * **Technical Problem:** Deploying unvalidated security rules to vehicles can cause catastrophic collateral damage during emergency driving.
+        * **Our Invention:** Autonomous replaying of candidate rules against uncompromised peer vehicle telemetry streams. If a rule would drop even 0.001% of legitimate safety-critical frames (emergency braking or steering), it is automatically downgraded to a rate limit or revoked.
+        
+        #### 4. Claim 4: Distributed Edge Cryptographic Synchronization
+        * **Technical Problem:** Centralized OEM cloud servers represent single points of failure vulnerable to network cutoffs and cloud hacks.
+        * **Our Invention:** Signed immutable state synchronization replicating verified antibodies across edge gateway nodes with zero single-point-of-failure exposure.
+        """)
+        st.download_button(
+            "📄 Download Patent Disclosure Specification (Markdown)",
+            data=patent_spec.PATENT_SPECIFICATION_MARKDOWN,
+            file_name="ImmuneFleet_Patent_Specification_Brief.md",
+            mime="text/markdown",
+            use_container_width=True
+        )
 
 # ---------------------------------------------------------------- live attack lab
 render_live_defense()
