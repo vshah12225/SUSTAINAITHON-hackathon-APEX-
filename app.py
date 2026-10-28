@@ -86,11 +86,11 @@ html,body,.stApp{background:var(--bg)!important}
 @keyframes gridmove{to{background-position:0 64px}}
 @keyframes rise{0%{transform:translate3d(0,0,0) rotate(0);opacity:0}10%{opacity:.7}90%{opacity:.5}100%{transform:translate3d(var(--dx),-108vh,0) rotate(360deg);opacity:0}}
 /* ---- nav pill */
-.nav{display:flex;align-items:center;justify-content:space-between;padding:12px 28px;border:1.5px solid #d98bab;border-radius:26px 26px 60px 26px;background:rgba(10,3,8,.72);backdrop-filter:blur(14px)}
+.nav{position:sticky;top:12px;z-index:999;display:flex;align-items:center;justify-content:space-between;padding:12px 28px;border:1.5px solid #d98bab;border-radius:26px 26px 60px 26px;background:rgba(10,3,8,.85);backdrop-filter:blur(18px);box-shadow:0 12px 36px rgba(0,0,0,.65)}
 .nav .brand{display:flex;align-items:center;gap:12px;font:600 20px var(--serif);color:#fff}
 .nav .links{display:flex;gap:34px}
-.nav a{font:600 17px var(--serif);color:#fff!important;text-decoration:none;transition:color .2s}
-.nav a:hover{color:var(--pink)!important}
+.nav a{font:600 17px var(--serif);color:#fff!important;text-decoration:none;transition:all .2s;cursor:pointer}
+.nav a:hover{color:var(--pink)!important;transform:translateY(-1px)}
 /* ---- hero */
 .hero{--m:var(--grn);text-align:center;padding:30px 0 6px}
 .m-breach{--m:var(--red)}.m-secure{--m:var(--cy)}
@@ -170,7 +170,7 @@ html,body,.stApp{background:var(--bg)!important}
 [data-testid=stAlert]{background:rgba(255,45,85,.1);border:1px solid rgba(255,45,85,.4);border-radius:12px}
 /* ---- shared icon orb */
 .orb{width:54px;height:54px;flex:none;display:grid;place-items:center;font-size:25px;border-radius:50%;border:2px solid var(--oc,var(--pink));background:color-mix(in srgb,var(--oc,var(--pink)) 14%,rgba(8,3,7,.8));box-shadow:0 0 18px color-mix(in srgb,var(--oc,var(--pink)) 45%,transparent);transition:all .4s}
-h2.sec{scroll-margin-top:14px}
+h2.sec{scroll-margin-top:86px!important}
 /* ---- stress-test buttons */
 .st-key-chaos_poison{--bc:#ff2d55}.st-key-chaos_bad{--bc:#ffa31a}.st-key-chaos_time{--bc:#22d3ff}
 [class*="st-key-chaos"] button{min-height:3.6rem;border-radius:20px;border:1.5px solid var(--bc);background:linear-gradient(135deg,color-mix(in srgb,var(--bc) 28%,#14060c),rgba(10,3,8,.85) 78%);box-shadow:0 0 18px color-mix(in srgb,var(--bc) 28%,transparent),inset 0 1px 0 rgba(255,255,255,.12)}
@@ -760,6 +760,55 @@ if S.rollout:
 # ---------------------------------------------------------------- page
 st.markdown(custom_css + background(), unsafe_allow_html=True)
 st.markdown(NAV, unsafe_allow_html=True)
+components.html("""<script>
+(function(){
+    try {
+        var P = window.parent;
+        var D = P.document;
+        if (P.__ifNavActive) return;
+        P.__ifNavActive = true;
+
+        var TEXT_MAP = {
+            'fleet': 'fleet',
+            'evidence': 'what leaves the car',
+            'consensus': 'cloud',
+            'virus': 'virus lab',
+            'benchmark': 'benchmark',
+            'log': 'event log'
+        };
+
+        function getTarget(id) {
+            var el = D.getElementById(id) || D.querySelector('#' + id);
+            if (el) return el;
+            var keyword = TEXT_MAP[id] || id;
+            var headings = D.querySelectorAll('h1, h2, h3, h4');
+            for (var i = 0; i < headings.length; i++) {
+                if (headings[i].textContent.trim().toLowerCase().indexOf(keyword) !== -1) {
+                    return headings[i];
+                }
+            }
+            return null;
+        }
+
+        D.addEventListener('click', function(e) {
+            var a = e.target.closest && e.target.closest('.nav a');
+            if (!a) return;
+            var href = a.getAttribute('href') || '';
+            if (href.indexOf('#') === -1) return;
+            e.preventDefault();
+            e.stopPropagation();
+            var id = href.split('#')[1];
+            if (!id) return;
+            var target = getTarget(id);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, true);
+    } catch(err) {
+        console.warn('Nav script:', err);
+    }
+})();
+</script>""", height=0)
 st.markdown(hero_html(S.cars), unsafe_allow_html=True)
 
 _, p1, p2, _ = st.columns([2, 1.5, 1.5, 2])
@@ -962,18 +1011,6 @@ st.markdown("<p class='secsub'>The story of a defense, step by step. Click any e
 st.markdown(log_ribbon(S.cloud.events), unsafe_allow_html=True)
 _flt = st.radio("Show", list(FILTERS), horizontal=True, key="ev_filter", label_visibility="collapsed")
 st.markdown(log_html(S.cloud.events, _flt), unsafe_allow_html=True)
-
-
-st.html("""<script>
-(function(){var P=window.parent,D=P.document;if(P.__ifNav)return;P.__ifNav=1;
-var MAP={fleet:'the fleet',evidence:'what leaves the car',consensus:'cloud',virus:'virus lab',benchmark:'real vehicle can benchmark',log:'event log'};
-function find(id){var el=D.getElementById(id);if(el)return el;var hs=D.querySelectorAll('h1,h2,h3');
-for(var i=0;i<hs.length;i++){if(hs[i].textContent.trim().toLowerCase()===MAP[id])return hs[i];}return null}
-D.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('.nav a');if(!a)return;
-var id=(a.getAttribute('href')||'').replace('#','');if(!MAP[id])return;e.preventDefault();
-var el=find(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});},true);
-})();
-</script>""")
 
 # ---------------------------------------------------------------- driver (rollout stages and auto-play)
 if S.rollout:
