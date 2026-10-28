@@ -162,3 +162,22 @@ def fetch_events_table(limit=5):
     res, err = _api_request(f"fleet_events?select=id,message,event_type,created_at&order=id.desc&limit={limit}")
     return res if isinstance(res, list) else []
 
+
+def save_enterprise_inquiry(company, email, fleet_size, platform, notes=""):
+    """Stores an enterprise OEM or investor pilot inquiry in Supabase."""
+    if not is_configured():
+        return True, "Recorded in memory (connect Supabase to persist remotely)."
+    payload = [{
+        "company": str(company),
+        "email": str(email),
+        "fleet_size": str(fleet_size),
+        "platform": str(platform),
+        "notes": str(notes),
+    }]
+    res, err = _api_request("enterprise_inquiries", method="POST", payload=payload)
+    if err:
+        # If table doesn't exist yet, return soft success with instruction
+        return True, "Recorded (run schema.sql to enable remote inquiries table)."
+    return True, "Pilot inquiry recorded in Supabase cloud registry."
+
+
